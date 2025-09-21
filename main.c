@@ -40,6 +40,7 @@ char *ft_substr(char *s, int start, int end)
 	}
 	return res;
 }
+		
 int load_map(FILE *f, t_map *map)
 {
 	map->map = (char**)malloc(sizeof(char *) * (map->height + 1));
@@ -48,7 +49,7 @@ int load_map(FILE *f, t_map *map)
 	map->map[map->height] = 0;
 	int read;
 	size_t len;
-	char *line =NULL;
+	char *line = NULL;
 	if (getline(&line, &len, f) == -1)
 		return free_map(map);
 
@@ -104,6 +105,8 @@ int min(int a, int b, int c)
 void find_square(t_map *map, t_elements *elements)
 {
 	int matrix[map->height][map->width];
+
+	map->best = 0;
 	for (int i = 0; i < map->height; i++)
 	{
 		for (int j = 0; j < map->width; j++)
@@ -111,14 +114,7 @@ void find_square(t_map *map, t_elements *elements)
 			matrix[i][j] = 0;
 			if ((i == 0 || j == 0) && map->map[i][j] == elements->empty)
 				matrix[i][j] = 1;
-
-		}
-	}
-	map->best = 0;
-	for (int i = 0; i < map->height; i++)
-	{
-		for (int j = 0; j < map->width; j++)
-		{
+		
 			if (i > 0 && j > 0 && map->map[i][j] == elements->empty)
 				matrix[i][j] = min(matrix[i - 1][j], matrix[i][j - 1], matrix[i - 1][j - 1]) + 1;
 
@@ -139,11 +135,11 @@ void print_res(t_map *map, t_elements *elements)
 		for (int j = 0; j < map->width; j ++)
 		{
 			if (map->start_i <= i && i < map->start_i + map->best && map->start_j <= j && j < map->start_j + map->best)
-				fprintf(stdout, "%c", elements->full);
+				printf("%c", elements->full);
 			else
-				fprintf(stdout, "%c", map->map[i][j]);
+				printf("%c", map->map[i][j]);
 		}
-		fprintf(stdout, "\n");
+		printf("\n");
 	}
 }
 
@@ -181,15 +177,10 @@ int open_execute(char *s)
 
 int main(int argc, char **argv)
 {
-	if (argc == 1)
-	{
-		if (execute(stdin) == -1)
-			fprintf(stdout, "Error: invalid map\n");
-	}
-	else if (argc == 2)
-	{
-		if (open_execute(argv[1]) == -1)
-			fprintf(stdout, "Error: invalid map\n");
-	}
+	if (argc == 1 && execute(stdin) == -1)
+		printf("Error: invalid map\n");
+	else if (argc == 2 && open_execute(argv[1]) == -1)
+		printf("Error: invalid map\n");
+
 	return 0;
 }
